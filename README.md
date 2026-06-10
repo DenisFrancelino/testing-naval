@@ -11,13 +11,6 @@ Jogo de Campo Minado fullstack com autenticação JWT, ranking global e três ta
 
 ---
 
-## Pré-requisitos
-
-- Python 3.11+
-- Uma instância PostgreSQL (local ou na nuvem — ex: [Neon](https://neon.tech))
-
----
-
 ## Como rodar localmente
 
 ### 1. Clone o repositório
@@ -27,7 +20,7 @@ git clone https://github.com/DenisFrancelino/testing-naval.git
 cd testing-naval
 ```
 
-### 2. Configure o backend
+### 2. Configure o ambiente virtual
 
 ```bash
 cd backend
@@ -44,51 +37,65 @@ Ative o ambiente virtual:
 source .venv/bin/activate
 ```
 
-Instale as dependências:
+### 3. Instale as dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Crie o arquivo `.env` dentro da pasta `backend/`:
+### 4. Configure as variáveis de ambiente
+
+Copie o arquivo de exemplo e renomeie para `.env`:
+
+```bash
+# Windows
+copy .env.sample .env
+
+# Linux / Mac
+cp .env.sample .env
+```
+
+Abra o arquivo `.env` e preencha com os seus dados:
 
 ```env
 DATABASE_URL=postgresql://usuario:senha@host/banco?sslmode=require
-SECRET_KEY=uma-chave-secreta-longa-qualquer
+SECRET_KEY=troque-por-uma-chave-longa-e-aleatoria
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
 
-> O `DATABASE_URL` deve apontar para o seu banco PostgreSQL. As tabelas são criadas automaticamente na primeira execução.
+> As tabelas são criadas automaticamente no banco na primeira execução, não é necessário rodar migrations.
 
-### 3. Suba o backend
+### 5. Suba o backend
 
 ```bash
 uvicorn main:app --reload
 ```
 
-A API estará disponível em `http://localhost:8000`.  
-Documentação interativa: `http://localhost:8000/docs`
+A API estará disponível em `http://localhost:8000`.
+Documentação interativa (Swagger): `http://localhost:8000/docs`
 
-### 4. Abra o frontend
+### 6. Abra o frontend
 
-Com o backend rodando, abra o arquivo no navegador:
+Com o backend rodando, abra o arquivo abaixo no navegador:
 
 ```
 frontend/login.html
 ```
 
-Ou arraste o arquivo direto para o navegador.
+Arraste o arquivo para o navegador ou cole o caminho completo na barra de endereço. Essa é a página inicial — a partir dela você acessa o jogo e o ranking.
 
 ---
 
 ## Páginas
 
-| Arquivo | Rota | Descrição |
-|---|---|---|
-| `login.html` | `/login` | Login e cadastro |
-| `index.html` | `/` | Jogo (protegido) |
-| `ranking.html` | `/ranking` | Top 30 por tabuleiro (protegido) |
+| Arquivo | Descrição |
+|---|---|
+| `frontend/login.html` | **Comece aqui** — login e cadastro |
+| `frontend/index.html` | Jogo (redireciona para login se não autenticado) |
+| `frontend/ranking.html` | Top 30 por tamanho de tabuleiro |
+
+---
 
 ## Endpoints da API
 
@@ -104,10 +111,10 @@ Ou arraste o arquivo direto para o navegador.
 ## Como jogar
 
 - **Clique esquerdo** — revela a célula
-- **Clique direito** — marca/desmarca uma bandeira 🚩
+- **Clique direito** — marca/desmarca bandeira 🚩
 - Os números indicam quantas minas existem nas células vizinhas
 - Vença revelando todas as células sem minas
-- Ao vencer, o score (tempo) é salvo automaticamente no ranking
+- Ao vencer, o score (tempo em segundos) é salvo automaticamente no ranking
 
 ### Tamanhos disponíveis
 
@@ -124,11 +131,13 @@ Ou arraste o arquivo direto para o navegador.
 ```
 backend/
 ├── main.py                  # Entry point FastAPI
-├── app/
-│   ├── api/                 # Routers (controllers)
-│   ├── services/            # Lógica de negócio
-│   ├── repositories/        # Acesso ao banco
-│   ├── models/              # SQLAlchemy models
-│   ├── schemas/             # Pydantic DTOs
-│   └── core/                # Config, DB, JWT, segurança
+├── requirements.txt         # Dependências Python
+├── .env.sample              # Exemplo de configuração
+└── app/
+    ├── api/                 # Routers — recebem e respondem requisições HTTP
+    ├── services/            # Regras de negócio
+    ├── repositories/        # Acesso ao banco de dados
+    ├── models/              # SQLAlchemy models (tabelas)
+    ├── schemas/             # Pydantic DTOs (validação de dados)
+    └── core/                # Config, conexão com banco, JWT e segurança
 ```
