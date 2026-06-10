@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import Base, engine
+import app.models  # noqa: F401 - garante que os models sejam registrados
 
-# Create tables on startup
+# Cria as tabelas no banco
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Campo Minado API", version="1.0.0")
