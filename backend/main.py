@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import Base, engine
 import app.models  # noqa: F401 - garante que os models sejam registrados
 from app.api.auth_router import router as auth_router
+from app.api.score_router import router as score_router
 
 # Cria as tabelas no banco
 Base.metadata.create_all(bind=engine)
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(score_router)
 
 
 @app.get("/health")
