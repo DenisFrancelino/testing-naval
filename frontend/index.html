@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campo Minado</title>
+  <link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+
+  <header>
+    <h1>💣 Campo Minado</h1>
+    <div class="user-info">
+      <span id="user-email"></span>
+      <a href="ranking.html">🏆 Ranking</a>
+      <a onclick="logout()">Sair</a>
+    </div>
+  </header>
+
+  <div class="controls">
+    <button class="btn btn-size active" data-size="9x9">9×9 (fácil)</button>
+    <button class="btn btn-size" data-size="16x16">16×16 (médio)</button>
+    <button class="btn btn-size" data-size="30x16">30×16 (difícil)</button>
+    <button class="btn btn-start" onclick="startGame()">▶ Novo Jogo</button>
+  </div>
+
+  <div class="status-bar">
+    <span>💣 <strong id="mines-left">0</strong></span>
+    <span>⏱ <strong id="timer">0</strong>s</span>
+  </div>
+
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
+
+  <!-- Overlay vitória / derrota -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-box">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-msg"></p>
+      <button class="btn btn-start" onclick="startGame()">Jogar novamente</button>
+      <br/><br/>
+      <a href="ranking.html" class="btn">Ver Ranking</a>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+    // Protege a rota
+    const token = requireAuth();
+
+    // Mostra email do usuário (decodifica JWT)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // o sub é o user_id, mas vamos só indicar que está logado
+    } catch(e) {}
+
+    // Inicia um jogo ao carregar
+    startGame();
+  </script>
+</body>
+</html>
