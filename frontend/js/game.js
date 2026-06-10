@@ -221,9 +221,11 @@ async function endGame(won) {
   if (won) {
     try {
       const token = getToken();
-      await apiPost('/scores', { board_size: selectedSize, time_seconds: elapsedSeconds }, token);
+      console.log('Salvando score:', { board_size: selectedSize, time_seconds: elapsedSeconds });
+      const result = await apiPost('/scores', { board_size: selectedSize, time_seconds: elapsedSeconds }, token);
+      console.log('Score salvo com sucesso:', result);
     } catch (e) {
-      console.error('Erro ao salvar score:', e);
+      console.error('Erro ao salvar score:', e.message);
     }
     overlayTitle.textContent = '🎉 Vitória!';
     overlayMsg.textContent = `Você ganhou em ${elapsedSeconds}s no tabuleiro ${selectedSize}.`;
@@ -241,4 +243,11 @@ function startTimer() {
     elapsedSeconds++;
     timerEl.textContent = elapsedSeconds;
   }, 1000);
+}
+
+// ── Teste: simula vitória sem jogar ──────────────────────
+function simulateWin() {
+  elapsedSeconds = 42;
+  gameState = 'playing';
+  endGame(true);
 }
