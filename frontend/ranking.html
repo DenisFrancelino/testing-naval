@@ -19,6 +19,12 @@
   <div class="loading" id="loading">Carregando...</div>
   <p class="empty-msg" id="empty-msg" style="display:none">Nenhuma pontuação ainda. Seja o primeiro!</p>
 
+  <div class="tabs" id="tabs" style="display:none">
+    <button class="tab active" data-size="9x9">9×9</button>
+    <button class="tab" data-size="16x16">16×16</button>
+    <button class="tab" data-size="30x16">30×16</button>
+  </div>
+
   <table class="ranking-table" id="ranking-table" style="display:none">
     <thead>
       <tr>
@@ -34,44 +40,65 @@
   <script src="js/api.js"></script>
   <script>
     const token = requireAuth();
-
     const medals = ['gold', 'silver', 'bronze'];
+    let allScores = [];
+    let activeSize = '9x9';
 
     async function loadRanking() {
       try {
-        const scores = await apiGet('/scores/ranking', token);
-
+        allScores = await apiGet('/scores/ranking', token);
         document.getElementById('loading').style.display = 'none';
 
-        if (!scores.length) {
+        if (!allScores.length) {
           document.getElementById('empty-msg').style.display = 'block';
           return;
         }
 
-        const tbody = document.getElementById('ranking-body');
-        scores.forEach((s, i) => {
-          const rank = i + 1;
-          const medalClass = medals[i] || '';
-          const email = s.user_email;
-          const masked = email.length > 20
-            ? email.slice(0, 10) + '...' + email.slice(email.lastIndexOf('@'))
-            : email;
-
-          tbody.innerHTML += `
-            <tr>
-              <td><span class="rank-badge ${medalClass}">${rank}°</span></td>
-              <td>${masked}</td>
-              <td>${s.board_size}</td>
-              <td><span class="time-value">${s.time_seconds}s</span></td>
-            </tr>
-          `;
-        });
-
+        document.getElementById('tabs').style.display = 'flex';
         document.getElementById('ranking-table').style.display = 'table';
+        renderTable(activeSize);
       } catch (err) {
         document.getElementById('loading').textContent = 'Erro ao carregar ranking.';
       }
     }
+
+    function renderTable(size) {
+      const filtered = allScores.filter(s => s.board_size === size);
+      const tbody = document.getElementById('ranking-body');
+      tbody.innerHTML = '';
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Sem pontuações para este tabuleiro</td></tr>';
+        return;
+      }
+
+      filtered.forEach((s, i) => {
+        const rank = i + 1;
+        const medalClass = medals[i] || '';
+        const email = s.user_email || 'desconhecido';
+        const masked = email.length > 22
+          ? email.slice(0, 10) + '...' + email.slice(email.lastIndexOf('@'))
+          : email;
+
+        tbody.innerHTML += `
+          <tr>
+            <td><span class="rank-badge ${medalClass}">${rank}°</span></td>
+            <td>${masked}</td>
+            <td>${s.board_size}</td>
+            <td><span class="time-value">${s.time_seconds}s</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeSize = btn.dataset.size;
+        renderTable(activeSize);
+      });
+    });
 
     loadRanking();
   </script>

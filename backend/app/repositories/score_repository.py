@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.models.score import Score
 
 
@@ -13,6 +13,7 @@ def create(db: Session, user_id: int, board_size: str, time_seconds: float) -> S
 def get_top30(db: Session) -> list[Score]:
     return (
         db.query(Score)
+        .options(joinedload(Score.user))
         .order_by(Score.time_seconds.asc())
         .limit(30)
         .all()

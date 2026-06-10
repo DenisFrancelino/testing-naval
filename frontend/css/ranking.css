@@ -100,3 +100,33 @@ header a {
   color: #aaa;
   margin-top: 40px;
 }
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.tab {
+  padding: 8px 24px;
+  border: 2px solid #0f3460;
+  border-radius: 8px;
+  background: #16213e;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  border-color: #e94560;
+  color: #eee;
+}
+
+.tab.active {
+  border-color: #e94560;
+  color: #e94560;
+  font-weight: bold;
+}
