@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campo Minado — Ranking</title>
+  <link rel="stylesheet" href="css/ranking.css" />
+</head>
+<body>
+
+  <header>
+    <h1>🏆 Top 30 — Ranking Global</h1>
+    <div style="display:flex;gap:16px;">
+      <a href="index.html">🎮 Jogar</a>
+      <a onclick="logout()">Sair</a>
+    </div>
+  </header>
+
+  <div class="loading" id="loading">Carregando...</div>
+  <p class="empty-msg" id="empty-msg" style="display:none">Nenhuma pontuação ainda. Seja o primeiro!</p>
+
+  <table class="ranking-table" id="ranking-table" style="display:none">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Jogador</th>
+        <th>Tabuleiro</th>
+        <th>Tempo</th>
+      </tr>
+    </thead>
+    <tbody id="ranking-body"></tbody>
+  </table>
+
+  <script src="js/api.js"></script>
+  <script>
+    const token = requireAuth();
+
+    const medals = ['gold', 'silver', 'bronze'];
+
+    async function loadRanking() {
+      try {
+        const scores = await apiGet('/scores/ranking', token);
+
+        document.getElementById('loading').style.display = 'none';
+
+        if (!scores.length) {
+          document.getElementById('empty-msg').style.display = 'block';
+          return;
+        }
+
+        const tbody = document.getElementById('ranking-body');
+        scores.forEach((s, i) => {
+          const rank = i + 1;
+          const medalClass = medals[i] || '';
+          const email = s.user_email;
+          const masked = email.length > 20
+            ? email.slice(0, 10) + '...' + email.slice(email.lastIndexOf('@'))
+            : email;
+
+          tbody.innerHTML += `
+            <tr>
+              <td><span class="rank-badge ${medalClass}">${rank}°</span></td>
+              <td>${masked}</td>
+              <td>${s.board_size}</td>
+              <td><span class="time-value">${s.time_seconds}s</span></td>
+            </tr>
+          `;
+        });
+
+        document.getElementById('ranking-table').style.display = 'table';
+      } catch (err) {
+        document.getElementById('loading').textContent = 'Erro ao carregar ranking.';
+      }
+    }
+
+    loadRanking();
+  </script>
+</body>
+</html>
