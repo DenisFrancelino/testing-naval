@@ -50,10 +50,10 @@
     // Protege a rota
     const token = requireAuth();
 
-    // Mostra email do usuário (decodifica JWT)
+    // Mostra email do usuário decodificado do JWT
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      // o sub é o user_id, mas vamos só indicar que está logado
+      document.getElementById('user-email').textContent = '👤 ' + payload.email;
     } catch(e) {}
 
     // Inicia um jogo ao carregar

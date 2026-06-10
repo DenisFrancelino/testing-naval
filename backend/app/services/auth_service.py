@@ -13,7 +13,7 @@ def register(db: Session, data: UserCreate) -> Token:
         )
     hashed = hash_password(data.password)
     user = user_repository.create(db, data.email, hashed)
-    token = create_access_token(user.id)
+    token = create_access_token(user.id, user.email)
     return Token(access_token=token)
 
 
@@ -24,5 +24,5 @@ def login(db: Session, email: str, password: str) -> Token:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Credenciais inválidas",
         )
-    token = create_access_token(user.id)
+    token = create_access_token(user.id, user.email)
     return Token(access_token=token)
