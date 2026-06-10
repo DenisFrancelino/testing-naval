@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campo Minado — Login</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="card">
+    <h1>💣 Campo Minado</h1>
+    <p class="subtitle" id="subtitle">Entre na sua conta</p>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <form id="auth-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="seu@email.com" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="••••••••" required />
+      </div>
+      <button class="btn" id="submit-btn" type="submit">Entrar</button>
+    </form>
+
+    <div class="toggle-link">
+      <span id="toggle-text">Não tem conta?</span>
+      <a id="toggle-link" onclick="toggleMode()">Cadastrar</a>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    let isRegister = false;
+
+    // Redireciona se já estiver logado
+    if (getToken()) window.location.href = 'index.html';
+
+    function toggleMode() {
+      isRegister = !isRegister;
+      document.getElementById('subtitle').textContent = isRegister
+        ? 'Crie sua conta'
+        : 'Entre na sua conta';
+      document.getElementById('submit-btn').textContent = isRegister
+        ? 'Cadastrar'
+        : 'Entrar';
+      document.getElementById('toggle-text').textContent = isRegister
+        ? 'Já tem conta?'
+        : 'Não tem conta?';
+      document.getElementById('toggle-link').textContent = isRegister
+        ? 'Entrar'
+        : 'Cadastrar';
+      showError('');
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('submit-btn');
+
+      btn.disabled = true;
+      btn.textContent = 'Aguarde...';
+      showError('');
+
+      try {
+        const endpoint = isRegister ? '/auth/register' : '/auth/login';
+        const data = await apiPost(endpoint, { email, password });
+        setToken(data.access_token);
+        window.location.href = 'index.html';
+      } catch (err) {
+        showError(err.message);
+        btn.disabled = false;
+        btn.textContent = isRegister ? 'Cadastrar' : 'Entrar';
+      }
+    });
+  </script>
+</body>
+</html>
